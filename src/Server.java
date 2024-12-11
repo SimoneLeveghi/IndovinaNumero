@@ -5,16 +5,21 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
+import java.util.Random;
 
 public class Server {
     private ServerSocket server;
     private Socket client;
     private final int porta;
+    private final int numIndov;
 
     public Server() {
+        Random r = new Random();
+
         server = null;
         client = null;
         porta = 1234;
+        numIndov = r.nextInt(1000);
     }
     private class ClientHandler implements Runnable {
         private Socket clientSocket;
@@ -27,13 +32,24 @@ public class Server {
             try {
                 BufferedReader clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 DataOutputStream serverOutput = new DataOutputStream(clientSocket.getOutputStream());
+                int tentativo = -1;
+                System.out.println("NumIndov: " + numIndov);
 
-                while (true) {
+                while (tentativo != numIndov) {
                     String message = clientInput.readLine();
                     System.out.println("Messaggio ricevuto da client: " + message);
-                    serverOutput.writeBytes(message + "\n");
+
+                    try {
+                        tentativo = Integer.parseInt(message);
+                        serverOutput.writeBytes((tentativo < numIndov? "minore" : "maggiore") + "\n");
+                    }
+                    catch (Exception e) {
+                        serverOutput.writeBytes("Valore non valido" + "\n");
+                    }
+
                     serverOutput.flush();
                 }
+                serverOutput.writeBytes("Numero indovinato\n");
             } catch (IOException e) {
                 System.out.println("Comunicazione interrotta con il client.");
             }

@@ -39,13 +39,14 @@ public class Client {
 
     public void comunica() {
         try {
-            while(!userInputString.equals("Fine")) {
+            while(serverInput != null) {
                 System.out.print("Stringa da inviare al server: ");
                 userInputString = userInput.readLine();
 
                 clientOutput.writeBytes(userInputString + '\n');
                 System.out.println("Risposta dal server: " + serverInput.readLine());
             }
+            System.out.println("Gioco terminato.");
             System.out.println("Connessione terminata.");
             clientSocket.close();
         } catch(Exception e) {
